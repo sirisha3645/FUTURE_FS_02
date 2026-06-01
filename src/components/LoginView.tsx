@@ -34,11 +34,6 @@ export default function LoginView({ onLoginSuccess, onNavigateToRegister }: Logi
     }
   };
 
-  const fillDemoCreds = () => {
-    setEmail('admin@crm.com');
-    setPassword('admin123');
-    setError(null);
-  };
 
   return (
     <div id="login-layout-container" className="min-h-screen bg-slate-50 flex items-center justify-center p-4" style={{
@@ -113,22 +108,6 @@ export default function LoginView({ onLoginSuccess, onNavigateToRegister }: Logi
           </button>
         </form>
 
-        <div className="relative flex py-4 items-center">
-          <div className="flex-grow border-t border-slate-800"></div>
-          <span className="flex-shrink mx-4 text-xs font-medium text-slate-500 uppercase tracking-widest">
-            OR EVALUATE
-          </span>
-          <div className="flex-grow border-t border-slate-800"></div>
-        </div>
-
-        <button
-          id="btn-fill-demo"
-          type="button"
-          onClick={fillDemoCreds}
-          className="w-full bg-violet-600/10 hover:bg-violet-600/20 text-violet-300 font-medium text-xs px-4 py-3.5 rounded-xl border border-violet-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
-        >
-          ⚡ Auto-fill Demo Credentials (admin123)
-        </button>
 
         <p className="text-center text-xs text-slate-400 mt-8">
           Not yet registered?{' '}

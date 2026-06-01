@@ -187,3 +187,47 @@ All data paths require a signed header token `Authorization: Bearer <JWT_TOKEN>`
 
 ### Aggregate Performance Endpoints
 - `GET /api/analytics` : Retrieve pipeline calculations, percentages and counts.
+
+---
+
+## 🚀 Deploying to GitHub Pages (Both Ways)
+
+Since the React SPA frontend operates directly with Firebase (Auth, Firestore, and Storage) client-side, you can host your application's user interface completely for free on **GitHub Pages**. 
+
+You can deploy the app to GitHub Pages using **two convenient methods**:
+
+### Method A: Directly from the Terminal (Manual Deploy)
+
+This method lets you deploy the application to GitHub Pages instantly from your local development environment using your terminal.
+
+1. **Host Configuration Check**:
+   Make sure you have specified your repository URL correctly in `package.json` if needed, or that your remote `origin` is set.
+2. **Run Deploy Command**:
+   Execute the following command in your terminal:
+   ```bash
+   npm run deploy
+   ```
+3. **What is happening under the hood**:
+   - `npm run deploy` triggers `predeploy` which runs `npm run build` to compile the production-ready static assets into the `/dist` directory.
+   - It then invokes `gh-pages -d dist` to automatically create/verify a `gh-pages` branch, push the static built assets there, and trigger GitHub's hosting container.
+
+---
+
+### Method B: Automatically via GitHub Actions (Continuous Delivery)
+
+A custom workflow is already pre-configured in `.github/workflows/deploy.yml`. This automatically rebuilds and deploys your application on every push to your repository branches.
+
+1. **Commit and Push Your Code**:
+   Commit your changes and push them to your repository:
+   ```bash
+   git add .
+   git commit -m "Deploy update"
+   git push origin main
+   ```
+2. **Enable GitHub Pages settings in your repository**:
+   - Go to your GitHub repository in your web browser.
+   - Click on **Settings** -> **Pages**.
+   - Under **Build and deployment** -> **Source**, select **GitHub Actions** (instead of Deploy from a branch).
+3. **Monitor with Actions Tab**:
+   Click on the **Actions** tab in your repository. You will see the **Deploy React App to GitHub Pages** workflow compiling and deploying your site automatically!
+
