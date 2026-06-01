@@ -84,10 +84,10 @@ service cloud.firestore {
 
     // Lead collections permissions
     match /leads/{leadId} {
-      allow get, list: if isSignedIn() && isAdmin(request.auth.uid);
-      allow create: if isSignedIn() && isAdmin(request.auth.uid) && isValidId(leadId) && isValidLead(incoming());
-      allow update: if isSignedIn() && isAdmin(request.auth.uid) && isValidLead(incoming()) && incoming().id == existing().id && incoming().createdAt == existing().createdAt;
-      allow delete: if isSignedIn() && isAdmin(request.auth.uid);
+      allow get, list: if isSignedIn() && (isAdmin(request.auth.uid) || isSuperAdmin(request.auth.uid));
+      allow create: if isSignedIn() && (isAdmin(request.auth.uid) || isSuperAdmin(request.auth.uid)) && isValidId(leadId) && isValidLead(incoming());
+      allow update: if isSignedIn() && (isAdmin(request.auth.uid) || isSuperAdmin(request.auth.uid)) && isValidLead(incoming()) && incoming().id == existing().id && incoming().createdAt == existing().createdAt;
+      allow delete: if isSignedIn() && (isAdmin(request.auth.uid) || isSuperAdmin(request.auth.uid));
     }
 
     // File collections permissions

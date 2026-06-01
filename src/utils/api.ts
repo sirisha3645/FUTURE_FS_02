@@ -231,9 +231,18 @@ export const API = {
         if (docSnap.exists()) {
           const adminDoc = docSnap.data();
           name = adminDoc.name || name;
+        } else {
+          // Self-repair: Create a proper admin document if missing in Firestore
+          const selfAdmin: Admin = {
+            id: user.uid,
+            name,
+            email: user.email || '',
+            createdAt: new Date().toISOString()
+          };
+          await setDoc(doc(db, 'admins', user.uid), selfAdmin);
         }
       } catch (err) {
-        // silent ignore
+        console.warn('Could not auto-heal admin profile document during initialization:', err);
       }
 
       return {
