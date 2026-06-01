@@ -1,0 +1,73 @@
+{
+  "entities": {
+    "Admin": {
+      "title": "Admin",
+      "description": "Administrator profile synchronized with Firebase Auth.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Authenticating Firebase Auth User ID" },
+        "name": { "type": "string", "description": "Display name of the admin" },
+        "email": { "type": "string", "description": "Email address of the admin" },
+        "createdAt": { "type": "string", "description": "Timestamp of creation" }
+      },
+      "required": ["id", "name", "email", "createdAt"]
+    },
+    "Lead": {
+      "title": "Lead",
+      "description": "Client lead record containing inquiry details and follow-up timeline logs.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique Lead ID" },
+        "name": { "type": "string", "description": "Lead Full Name" },
+        "email": { "type": "string", "description": "Lead Email Address" },
+        "phone": { "type": "string", "description": "Lead Phone Number" },
+        "company": { "type": "string", "description": "Lead Company Name" },
+        "source": { "type": "string", "enum": ["Website", "Portfolio", "LinkedIn", "Referral", "Facebook", "Instagram", "Other"] },
+        "status": { "type": "string", "enum": ["New", "Contacted", "Converted"] },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "content": { "type": "string" },
+              "createdAt": { "type": "string" }
+            },
+            "required": ["id", "content", "createdAt"]
+          }
+        },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "source", "status", "notes", "createdAt", "updatedAt"]
+    },
+    "File": {
+      "title": "File",
+      "description": "User uploaded file metadata inside ClientSphere.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique File ID" },
+        "userId": { "type": "string", "description": "Uploader User ID" },
+        "name": { "type": "string", "description": "Filename" },
+        "size": { "type": "string", "description": "File size label" },
+        "type": { "type": "string", "description": "MIME type description" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["id", "userId", "name", "size", "type", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Administrator profiles"
+    },
+    "/leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Incoming leads collection"
+    },
+    "/files/{fileId}": {
+      "schema": "File",
+      "description": "Files uploaded by users"
+    }
+  }
+}

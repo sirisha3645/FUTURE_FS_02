@@ -1,0 +1,101 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global safety net - default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Connection test rule
+    match /test/connection {
+      allow read: if true;
+    }
+
+    // Reuseable global helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin(uid) {
+      return exists(/databases/$(database)/documents/admins/$(uid));
+    }
+
+    function isSuperAdmin(uid) {
+      return uid == 'SUPER_ADMIN_USER_ID'
+        || uid == 'sirsha3645-admin-uid'
+        || (request.auth != null && request.auth.token != null && (request.auth.token.email == "sirsha3645@gmail.com" || request.auth.token.email == "admin@crm.com"))
+        || (exists(/databases/$(database)/documents/admins/$(uid)) && get(/databases/$(database)/documents/admins/$(uid)).data.email == "sirsha3645@gmail.com")
+        || (exists(/databases/$(database)/documents/admins/$(uid)) && get(/databases/$(database)/documents/admins/$(uid)).data.email == "admin@crm.com");
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Admin validation blueprint
+    function isValidAdmin(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.name is string && data.name.size() <= 200
+        && data.email is string && data.email.size() <= 200
+        && data.createdAt is string && data.createdAt.size() <= 100;
+    }
+
+    // Lead validation blueprint
+    function isValidLead(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.name is string && data.name.size() <= 200
+        && data.email is string && data.email.size() <= 200
+        && data.phone is string && data.phone.size() <= 100
+        && data.company is string && data.company.size() <= 200
+        && data.source is string && (data.source == 'Website' || data.source == 'Portfolio' || data.source == 'LinkedIn' || data.source == 'Referral' || data.source == 'Facebook' || data.source == 'Instagram' || data.source == 'Other')
+        && data.status is string && (data.status == 'New' || data.status == 'Contacted' || data.status == 'Converted')
+        && data.notes is list
+        && data.createdAt is string && data.createdAt.size() <= 100
+        && data.updatedAt is string && data.updatedAt.size() <= 100;
+    }
+
+    // File validation blueprint
+    function isValidFile(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.userId is string && data.userId.size() <= 128
+        && data.name is string && data.name.size() <= 200
+        && data.size is string && data.size.size() <= 50
+        && data.type is string && data.type.size() <= 100
+        && data.createdAt is string && data.createdAt.size() <= 100;
+    }
+
+    // Admin profile permissions
+    match /admins/{adminId} {
+      allow get: if isSignedIn() && (request.auth.uid == adminId || isSuperAdmin(request.auth.uid));
+      allow list: if isSignedIn() && isSuperAdmin(request.auth.uid);
+      allow create: if isSignedIn() && request.auth.uid == adminId && isValidAdmin(incoming());
+      allow update: if isSignedIn() && request.auth.uid == adminId && isValidAdmin(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if false; // Admins are permanent profile handles
+    }
+
+    // Lead collections permissions
+    match /leads/{leadId} {
+      allow get, list: if isSignedIn() && isAdmin(request.auth.uid);
+      allow create: if isSignedIn() && isAdmin(request.auth.uid) && isValidId(leadId) && isValidLead(incoming());
+      allow update: if isSignedIn() && isAdmin(request.auth.uid) && isValidLead(incoming()) && incoming().id == existing().id && incoming().createdAt == existing().createdAt;
+      allow delete: if isSignedIn() && isAdmin(request.auth.uid);
+    }
+
+    // File collections permissions
+    match /files/{fileId} {
+      allow get, list: if isSignedIn() && (resource.data.userId == request.auth.uid || isSuperAdmin(request.auth.uid));
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid && isValidId(fileId) && isValidFile(incoming());
+      allow update: if isSignedIn() && (existing().userId == request.auth.uid || isSuperAdmin(request.auth.uid)) && isValidFile(incoming()) && incoming().id == existing().id && incoming().userId == existing().userId && incoming().createdAt == existing().createdAt;
+      allow delete: if isSignedIn() && (existing().userId == request.auth.uid || isSuperAdmin(request.auth.uid));
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Mini CRM",
+  "description": "Client Lead Management System to track and manage business contacts, status, and notes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
