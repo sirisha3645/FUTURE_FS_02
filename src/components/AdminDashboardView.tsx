@@ -30,6 +30,7 @@ export default function AdminDashboardView({ currentAdmin }: AdminDashboardViewP
   const [selectedUserFiles, setSelectedUserFiles] = useState<UserFile[]>([]);
   const [loadingSelectedUserFiles, setLoadingSelectedUserFiles] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [deletingAdminFileId, setDeletingAdminFileId] = useState<string | null>(null);
 
   // Main list fetch
   const fetchData = async () => {
@@ -71,15 +72,13 @@ export default function AdminDashboardView({ currentAdmin }: AdminDashboardViewP
   };
 
   // Delete a user's file from admin role
-  const handleDeleteUserFile = async (fileId: string) => {
-    if (!window.confirm('Are you absolutely sure you want to delete this file as Admin?')) {
-      return;
-    }
+  const executeDeleteUserFile = async (fileId: string) => {
     try {
       await API.files.delete(fileId);
       // Update local states
       setAllFiles(prev => prev.filter(f => f.id !== fileId));
       setSelectedUserFiles(prev => prev.filter(f => f.id !== fileId));
+      setDeletingAdminFileId(null);
     } catch (err) {
       alert(getFriendlyErrorMessage(err));
     }
@@ -305,13 +304,33 @@ export default function AdminDashboardView({ currentAdmin }: AdminDashboardViewP
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => handleDeleteUserFile(file.id)}
-                      className="p-2 text-rose-400 hover:text-rose-500 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/10 rounded-lg transition shrink-0 cursor-pointer"
-                      title="Delete file as Admin"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {deletingAdminFileId === file.id ? (
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => executeDeleteUserFile(file.id)}
+                          className="px-2 py-1 bg-red-600 hover:bg-red-500 text-white rounded text-[10px] font-bold transition duration-150 cursor-pointer"
+                        >
+                          Confirm
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeletingAdminFileId(null)}
+                          className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded text-[10px] font-bold transition duration-150 cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setDeletingAdminFileId(file.id)}
+                        className="p-2 text-rose-400 hover:text-rose-500 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/10 rounded-lg transition shrink-0 cursor-pointer"
+                        title="Delete file as Admin"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>

@@ -38,6 +38,7 @@ export default function LeadDetailsView({ leadId, onBackToList, onLeadUpdated }:
   const [isAddingNote, setIsAddingNote] = useState(false);
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState('');
+  const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null);
 
   // Fetch lead details initially
   const loadLeadDetails = async () => {
@@ -101,23 +102,22 @@ export default function LeadDetailsView({ leadId, onBackToList, onLeadUpdated }:
   };
 
   // Delete note handler
-  const handleDeleteNote = async (noteId: string) => {
+  const executeDeleteNote = async (noteId: string) => {
     if (!lead) return;
-    if (confirm('Irrevocably erase this follow-up message?')) {
-      try {
-        await API.leads.deleteNote(lead.id, noteId);
-        setLead(prev => {
-          if (!prev) return null;
-          return {
-            ...prev,
-            notes: prev.notes.filter(n => n.id !== noteId),
-            updatedAt: new Date().toISOString()
-          };
-        });
-        onLeadUpdated();
-      } catch (err: any) {
-        alert('Failed to delete note history record.');
-      }
+    try {
+      await API.leads.deleteNote(lead.id, noteId);
+      setLead(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          notes: prev.notes.filter(n => n.id !== noteId),
+          updatedAt: new Date().toISOString()
+        };
+      });
+      setDeletingNoteId(null);
+      onLeadUpdated();
+    } catch (err: any) {
+      alert('Failed to delete note history record.');
     }
   };
 
@@ -364,14 +364,33 @@ export default function LeadDetailsView({ leadId, onBackToList, onLeadUpdated }:
                           >
                             <Edit2 className="w-3 h-3" />
                           </button>
-                          <button
-                            id={`btn-delete-note-${note.id}`}
-                            onClick={() => handleDeleteNote(note.id)}
-                            className="text-slate-450 hover:text-rose-500 dark:text-slate-500 dark:hover:text-rose-400 hover:scale-105 transition-all"
-                            title="Delete note"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
+                          {deletingNoteId === note.id ? (
+                            <div className="inline-flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => executeDeleteNote(note.id)}
+                                className="px-1.5 py-0.5 bg-red-600 hover:bg-red-500 text-white rounded text-[9px] font-bold transition cursor-pointer"
+                              >
+                                Delete
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setDeletingNoteId(null)}
+                                className="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 rounded text-[9px] font-bold transition cursor-pointer"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              id={`btn-delete-note-${note.id}`}
+                              onClick={() => setDeletingNoteId(note.id)}
+                              className="text-slate-450 hover:text-rose-500 dark:text-slate-500 dark:hover:text-rose-400 hover:scale-105 transition-all"
+                              title="Delete note"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          )}
                         </div>
                       </div>
 

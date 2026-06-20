@@ -24,6 +24,7 @@ export default function MyFilesView({ admin }: MyFilesViewProps) {
   const [files, setFiles] = useState<UserFile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingFileId, setDeletingFileId] = useState<string | null>(null);
   
   // Drag-and-drop state
   const [dragActive, setDragActive] = useState<boolean>(false);
@@ -108,12 +109,10 @@ export default function MyFilesView({ admin }: MyFilesViewProps) {
   };
 
   const handleDeleteFile = async (fileId: string) => {
-    if (!window.confirm('Are you sure you want to delete this file?')) {
-      return;
-    }
     try {
       await API.files.delete(fileId);
       setFiles(prev => prev.filter(f => f.id !== fileId));
+      setDeletingFileId(null);
     } catch (err) {
       setError(getFriendlyErrorMessage(err));
     }
@@ -318,14 +317,33 @@ export default function MyFilesView({ admin }: MyFilesViewProps) {
                       </a>
                     ) : null}
 
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteFile(file.id)}
-                      className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/5 border border-slate-200 hover:border-red-500/10 dark:border-slate-800 rounded-lg text-xs transition cursor-pointer"
-                      title="Remove file"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {deletingFileId === file.id ? (
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteFile(file.id)}
+                          className="px-2 py-1 bg-red-600 hover:bg-red-500 text-white rounded text-[10px] font-bold transition duration-150 cursor-pointer"
+                        >
+                          Confirm
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeletingFileId(null)}
+                          className="px-2 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-850 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 rounded text-[10px] font-bold transition duration-150 cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setDeletingFileId(file.id)}
+                        className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/5 border border-slate-200 hover:border-red-500/10 dark:border-slate-800 rounded-lg text-xs transition cursor-pointer"
+                        title="Remove file"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))

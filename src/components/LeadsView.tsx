@@ -40,6 +40,7 @@ export default function LeadsView({
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingLeadId, setDeletingLeadId] = useState<string | null>(null);
 
   // Filter criteria
   const [search, setSearch] = useState('');
@@ -175,15 +176,13 @@ export default function LeadsView({
   };
 
   // Delete lead handler
-  const handleDelete = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation(); // prevent row click triggers
-    if (confirm('Are you sure you want to delete this lead record irrevocably?')) {
-      try {
-        await API.leads.delete(id);
-        loadLeads();
-      } catch (err: any) {
-        alert(getFriendlyErrorMessage(err));
-      }
+  const executeDeleteLead = async (id: string) => {
+    try {
+      await API.leads.delete(id);
+      setDeletingLeadId(null);
+      loadLeads();
+    } catch (err: any) {
+      alert(getFriendlyErrorMessage(err));
     }
   };
 
@@ -427,14 +426,33 @@ export default function LeadsView({
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
-                          <button
-                            id={`btn-delete-lead-${lead.id}`}
-                            onClick={(e) => handleDelete(e, lead.id)}
-                            className="p-2 bg-slate-50 dark:bg-slate-850 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-slate-400 hover:text-rose-500 dark:text-slate-500 dark:hover:text-rose-400 rounded-lg border border-slate-105 dark:border-slate-800/80 transition-all cursor-pointer"
-                            title="Delete Lead Record"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          {deletingLeadId === lead.id ? (
+                            <div className="inline-flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                              <button
+                                type="button"
+                                onClick={() => executeDeleteLead(lead.id)}
+                                className="px-2 py-1 bg-red-600 hover:bg-red-500 text-white rounded text-[10px] font-bold transition duration-150 cursor-pointer"
+                              >
+                                Confirm
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setDeletingLeadId(null)}
+                                className="px-2 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-850 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-350 rounded text-[10px] font-bold transition duration-150 cursor-pointer"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              id={`btn-delete-lead-${lead.id}`}
+                              onClick={(e) => { e.stopPropagation(); setDeletingLeadId(lead.id); }}
+                              className="p-2 bg-slate-50 dark:bg-slate-850 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-slate-400 hover:text-rose-500 dark:text-slate-500 dark:hover:text-rose-400 rounded-lg border border-slate-105 dark:border-slate-800/80 transition-all cursor-pointer"
+                              title="Delete Lead Record"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
