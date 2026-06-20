@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { API } from '../utils/api';
-import { LogIn, Sparkles, UserPlus, ShieldAlert } from 'lucide-react';
+import { LogIn, Briefcase, UserPlus, ShieldAlert } from 'lucide-react';
 
 interface LoginViewProps {
   onLoginSuccess: (token: string, admin: any) => void;
@@ -43,7 +43,7 @@ export default function LoginView({ onLoginSuccess, onNavigateToRegister }: Logi
       <div id="login-card" className="w-full max-w-md backdrop-blur-xl bg-slate-900/40 border border-violet-500/20 shadow-2xl rounded-3xl p-8 text-slate-100 transition-all duration-300">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-500 shadow-lg shadow-indigo-500/20 mb-4 animate-pulse">
-            <Sparkles className="w-7 h-7 text-white" />
+            <Briefcase className="w-7 h-7 text-white" />
           </div>
           <h2 className="text-3xl font-sans font-bold tracking-tight bg-gradient-to-r from-violet-300 via-indigo-200 to-purple-300 bg-clip-text text-transparent">
             Mini CRM System

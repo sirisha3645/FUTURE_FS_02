@@ -11,7 +11,7 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Download, 
-  Sparkles,
+  UserPlus,
   Loader,
   X,
   Phone,
@@ -504,7 +504,7 @@ export default function LeadsView({
             </button>
 
             <h3 className="text-base font-bold bg-gradient-to-r from-violet-600 to-indigo-505 bg-clip-text text-transparent inline-flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-violet-500" />
+              <UserPlus className="w-4 h-4 text-violet-500" />
               {editingLead ? 'Update Customer Profile' : 'Initiate Customer Prospect'}
             </h3>
             <p className="text-xs text-slate-450 dark:text-slate-400 mt-1">

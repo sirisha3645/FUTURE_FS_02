@@ -3,7 +3,7 @@ import { API } from '../utils/api';
 import { Lead, CRMAnalytics } from '../types';
 import { 
   Users, 
-  Sparkles, 
+  UserPlus, 
   PhoneCall, 
   CheckCircle, 
   Plus, 
@@ -84,7 +84,7 @@ export default function DashboardView({
       id: "card-new",
       title: "New Leads",
       value: metrics.newLeads,
-      icon: Sparkles,
+      icon: UserPlus,
       color: "from-amber-400 to-orange-500",
       textColor: "text-amber-500 dark:text-amber-400"
     },

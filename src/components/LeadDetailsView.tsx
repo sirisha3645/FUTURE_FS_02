@@ -12,7 +12,6 @@ import {
   Calendar, 
   CheckCircle, 
   Loader, 
-  Sparkles,
   PhoneCall,
   X,
   FileText,
