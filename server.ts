@@ -3,7 +3,6 @@ import path from 'path';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
-import { createServer as createViteServer } from 'vite';
 import { DB } from './server/db';
 
 dotenv.config();
@@ -340,6 +339,7 @@ app.get('/api/analytics', authenticateToken, async (req: express.Request, res: e
 // ==========================================
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa'
